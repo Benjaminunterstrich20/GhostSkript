@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <title>HeftChat - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+    <div class="heft-container">
+        <h1>HeftChat</h1>
+        <form action="/chat" method="get" class="heft-form">
+            <input type="text" name="username" placeholder="Dein Name" required />
+            <input type="text" name="room" placeholder="Raumcode" required />
+            <button type="submit">Join</button>
+        </form>
+        <p class="small-text">Enter room code to join or create a room.</p>
+    </div>
+</body>
+</html>
