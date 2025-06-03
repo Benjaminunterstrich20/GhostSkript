@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <title>HeftChat - Room {{ room }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js" integrity="sha384-u8uBkTYaEVqknVxZ+Hu6FX5UQ2hIq1tA9sUzPB2uCJh2cQu1eIm4Tn8FVuZfL1Hl" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="heft-container">
+        <h1>HeftChat - Raum: {{ room }}</h1>
+        <div id="chat" class="chat-box">
+            {% for msg in messages %}
+                <div class="message">
+                    <strong>{{ msg.user }}:</strong> {{ msg.msg }}
+                    {% if msg.img %}
+                        <br><img src="{{ msg.img }}" alt="Bild" class="chat-img" />
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <form id="chat-form" class="heft-form" onsubmit="return sendMessage(event)">
+            <input id="msg-input" autocomplete="off" placeholder="Nachricht schreiben..." />
+            <input type="file" id="img-input" accept="image/*" />
+            <button type="submit">Senden</button>
+        </form>
+    </div>
+
+<script>
+    const socket = io();
+
+    const room = "{{ room }}";
+    const username = "{{ username }}";
+
+    socket.emit('join', {room: room, username: username});
+
+    socket.on('status', function(data) {
+        const chat = document.getElementById('chat');
+        const div = document.createElement('div');
+        div.classList.add('status-msg');
+        div.textContent = data.msg;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+    });
+
+    socket.on('message', function(data) {
+        const chat = document.getElementById('chat');
+        const div = document.createElement('div');
+        div.classList.add('message');
+        let html = `<strong>${data.user}:</strong> ${data.msg || ''}`;
+        if (data.img) {
+            html += `<br><img src="${data.img}" alt="Bild" class="chat-img" />`;
+        }
+        div.innerHTML = html;
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
+    });
+
+    function sendMessage(e) {
+        e.preventDefault();
+        const msgInput = document.getElementById('msg-input');
+        const imgInput = document.getElementById('img-input');
+
+        if (!msgInput.value && imgInput.files.length === 0) {
+            return false; // nichts zu senden
+        }
+
+        if (imgInput.files.length > 0) {
+            const file = imgInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                socket.emit('message', {
+                    room: room,
+                    username: username,
+                    msg: msgInput.value,
+                    img: evt.target.result // base64 Bild
+                });
+                msgInput.value = '';
+                imgInput.value = '';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            socket.emit('message', {
+                room: room,
+                username: username,
+                msg: msgInput.value,
+                img: null
+            });
+            msgInput.value = '';
+        }
+        return false;
+    }
+</script>
+
+</body>
+</html>
