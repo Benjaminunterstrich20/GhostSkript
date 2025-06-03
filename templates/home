@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <title>Ghost Skript 👻 | Raum wählen</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Ghost Skript 👻</h1>
+        <form method="POST" style="margin-bottom: 20px;">
+            <input type="text" name="room" placeholder="Raum-Code eingeben..." required class="input-name" />
+            <button type="submit">Los geht's!</button>
+        </form>
+        <button onclick="window.location.href='{{ url_for('home') }}'" 
+                style="padding: 10px 20px; font-size: 1rem; cursor: pointer; border-radius: 12px; border: none; background-color: #58a6ff; color: white; transition: background-color 0.3s; width: 100%;">
+            Chatcode eintragen
+        </button>
+    </div>
+</body>
+</html>
